@@ -1,0 +1,5 @@
+yolo_conf: 0.35
+reid_similarity: 0.72
+fusion_time_window_sec: 3
+entry_line_margin_px: 40
+max_gallery_embeddings: 20

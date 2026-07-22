@@ -1,0 +1,296 @@
+(session FINAL.ses
+  (base_design FINAL.dsn)
+  (placement
+    (resolution um 10)
+    (component "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+      (place R1 1136650 -673100 front 270)
+    )
+    (component "Package_TO_SOT_THT:TO-92_Inline"
+      (place Q1 1231900 -706200 front 90)
+    )
+    (component "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm"
+      (place C1 1128501 -844300 front 0)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
+      (place J4 1282700 -846200 front 270)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+      (place J2 1111250 -984250 front 270)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+      (place J5 1339850 -706500 front 90)
+    )
+    (component "TerminalBlock_MetzConnect:TerminalBlock_MetzConnect_Type073_RT02602HBLU_1x02_P5.08mm_Horizontal"
+      (place J6 692150 -1017325 front 180)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+      (place J3 1155700 -609600 front 270)
+    )
+    (component "custom_footprints:ESP32_DEVKIT_V1_DOIT_30PIN"
+      (place U1 914400 -755650 front 270)
+    )
+  )
+  (was_is
+  )
+  (routes 
+    (resolution um 10)
+    (parser
+      (host_cad "KiCad's Pcbnew")
+      (host_version "10.0.2-rc1")
+    )
+    (library_out 
+      (padstack "Via[0-1]_1600:800_um"
+        (shape
+          (circle F.Cu 16000 0 0)
+        )
+        (shape
+          (circle B.Cu 16000 0 0)
+        )
+        (attach off)
+      )
+      (padstack "Via[0-1]_1800:900_um"
+        (shape
+          (circle F.Cu 18000 0 0)
+        )
+        (shape
+          (circle B.Cu 18000 0 0)
+        )
+        (attach off)
+      )
+      (padstack "Via[0-1]_1600:800_um"
+        (shape
+          (circle F.Cu 16000 0 0)
+        )
+        (shape
+          (circle B.Cu 16000 0 0)
+        )
+        (attach off)
+      )
+      (padstack "Via[0-1]_1600:800_um"
+        (shape
+          (circle F.Cu 16000 0 0)
+        )
+        (shape
+          (circle B.Cu 16000 0 0)
+        )
+        (attach off)
+      )
+      (padstack "Via[0-1]_1800:900_um"
+        (shape
+          (circle F.Cu 18000 0 0)
+        )
+        (shape
+          (circle B.Cu 18000 0 0)
+        )
+        (attach off)
+      )
+      (padstack "Via[0-1]_1800:900_um"
+        (shape
+          (circle F.Cu 18000 0 0)
+        )
+        (shape
+          (circle B.Cu 18000 0 0)
+        )
+        (attach off)
+      )
+    )
+    (network_out 
+      (net "/5V"
+        (wire
+          (path B.Cu 9000
+            1282700 -846200
+            1265541 -863359
+            1144064 -863359
+            1128501 -847796
+            1128501 -844300
+          )
+        )
+        (wire
+          (path F.Cu 9000
+            1286321 -706500
+            1286321 -825562
+            1282700 -829183
+          )
+        )
+        (wire
+          (path F.Cu 9000
+            1130300 -609600
+            1130300 -613851
+            1149925 -633476
+            1213297 -633476
+            1286321 -706500
+          )
+        )
+        (wire
+          (path F.Cu 9000
+            1286321 -706500
+            1322833 -706500
+          )
+        )
+        (wire
+          (path F.Cu 9000
+            1282700 -846200
+            1282700 -829183
+          )
+        )
+        (wire
+          (path F.Cu 9000
+            692150 -1017325
+            1107920 -1017325
+            1128501 -996744
+            1128501 -844300
+          )
+        )
+        (wire
+          (path F.Cu 9000
+            1339850 -706500
+            1322833 -706500
+          )
+        )
+        (wire
+          (path B.Cu 9000
+            558800 -628650
+            558800 -646167
+          )
+        )
+        (wire
+          (path B.Cu 9000
+            558800 -646167
+            541282 -663685
+            541282 -890030
+            632931 -981679
+            656504 -981679
+            692150 -1017325
+          )
+        )
+      )
+      (net "/I2C_SDA"
+        (wire
+          (path B.Cu 4500
+            1104900 -609600
+            1151260 -655960
+            1151260 -679358
+            1138377 -692241
+            1003209 -692241
+            812800 -882650
+          )
+        )
+      )
+      (net "/I2C_SCL"
+        (wire
+          (path B.Cu 4500
+            1079500 -609600
+            1094332 -594768
+            1166928 -594768
+            1170969 -598809
+            1170969 -671866
+            994610 -848225
+            923425 -848225
+            889000 -882650
+          )
+        )
+      )
+      (net "/BUZZER_SIG"
+        (wire
+          (path B.Cu 4500
+            711200 -628650
+            755650 -673100
+            1136650 -673100
+          )
+        )
+      )
+      (net "/BUZZER_BASE "
+        (wire
+          (path F.Cu 4500
+            1231900 -693500
+            1192450 -693500
+            1136650 -749300
+          )
+        )
+      )
+      (net "/SERVO_SIG"
+        (wire
+          (path F.Cu 4500
+            736600 -628650
+            901821 -793871
+            1179571 -793871
+            1231900 -846200
+          )
+        )
+      )
+      (net "/RFID_SS"
+        (wire
+          (path F.Cu 4500
+            1111250 -984250
+            946606 -819606
+            800556 -819606
+            609600 -628650
+          )
+        )
+      )
+      (net "/RFID_SCK"
+        (wire
+          (path B.Cu 4500
+            1085850 -984250
+            1071083 -999017
+            878367 -999017
+            762000 -882650
+          )
+        )
+      )
+      (net "/RFID_MOSI"
+        (wire
+          (path B.Cu 4500
+            914400 -882650
+            958850 -882650
+            1060450 -984250
+          )
+        )
+      )
+      (net "/RFID_MISO"
+        (wire
+          (path B.Cu 4500
+            787400 -882650
+            873930 -969180
+            1019980 -969180
+            1035050 -984250
+          )
+        )
+      )
+      (net "/RFID_RST"
+        (wire
+          (path F.Cu 4500
+            685800 -628650
+            670471 -613321
+            552005 -613321
+            543467 -621859
+            543467 -635461
+            768352 -860346
+            914333 -860346
+            958850 -904863
+            958850 -984250
+          )
+        )
+      )
+      (net "/3V3"
+        (wire
+          (path F.Cu 7000
+            558800 -882650
+            660400 -984250
+            933450 -984250
+          )
+        )
+      )
+      (net "/BUZZER_NEG "
+        (wire
+          (path B.Cu 4500
+            1365250 -706500
+            1365250 -705578
+            1340472 -680800
+            1231900 -680800
+          )
+        )
+      )
+    )
+  )
+)

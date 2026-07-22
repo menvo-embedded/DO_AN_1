@@ -1,0 +1,261 @@
+(session "warehouse_rfid_controller.ses"
+  (base_design "warehouse_rfid_controller.dsn")
+  (placement
+    (resolution um 10)
+    (component "TerminalBlock_MetzConnect:TerminalBlock_MetzConnect_Type073_RT02602HBLU_1x02_P5.08mm_Horizontal"
+      (place J6 692150 -1017325 front 180)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+      (place J2 1111250 -984250 front 270)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+      (place J5 1339850 -706500 front 90)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+      (place J3 1155700 -609600 front 270)
+    )
+    (component "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
+      (place J4 1282700 -846200 front 270)
+    )
+    (component "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+      (place R1 1136650 -673100 front 270)
+    )
+    (component "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm"
+      (place C1 1128501 -844300 front 0)
+    )
+    (component "Package_TO_SOT_THT:TO-92_Inline"
+      (place Q1 1231900 -706200 front 0)
+    )
+    (component "custom_footprints:ESP32_DEVKIT_V1_DOIT_30PIN"
+      (place U1 914400 -755650 front 270)
+    )
+  )
+  (was_is
+  )
+  (routes 
+    (resolution um 10)
+    (parser
+      (host_cad "KiCad's Pcbnew")
+      (host_version "10.0.2-rc1")
+    )
+    (library_out 
+      (padstack "Via[0-1]_600:300_um"
+        (shape
+          (circle F.Cu 6000 0 0)
+        )
+        (shape
+          (circle B.Cu 6000 0 0)
+        )
+        (attach off)
+      )
+      (padstack "Via[0-1]_600:300_um"
+        (shape
+          (circle F.Cu 6000 0 0)
+        )
+        (shape
+          (circle B.Cu 6000 0 0)
+        )
+        (attach off)
+      )
+    )
+    (network_out 
+      (net "/5V"
+        (wire
+          (path F.Cu 8000
+            1130300 -609600
+            1115366 -594666
+            592784 -594666
+            558800 -628650
+          )
+        )
+        (wire
+          (path B.Cu 8000
+            1142997 -829804
+            1266304 -829804
+          )
+        )
+        (wire
+          (path B.Cu 8000
+            1128501 -844300
+            1142997 -829804
+          )
+        )
+        (wire
+          (path B.Cu 8000
+            1130300 -609600
+            1122448 -617452
+            1122448 -809255
+            1142997 -829804
+          )
+        )
+        (wire
+          (path B.Cu 8000
+            1266304 -829804
+            1339850 -756258
+            1339850 -706500
+          )
+        )
+        (wire
+          (path B.Cu 8000
+            1266304 -829804
+            1282700 -846200
+          )
+        )
+        (wire
+          (path F.Cu 8000
+            558800 -628650
+            558800 -645650
+          )
+        )
+        (wire
+          (path F.Cu 8000
+            558800 -645650
+            543783 -660667
+            543783 -889318
+            671790 -1017325
+            692150 -1017325
+          )
+        )
+      )
+      (net "/3V3"
+        (wire
+          (path F.Cu 8000
+            558800 -882650
+            660400 -984250
+            933450 -984250
+          )
+        )
+      )
+      (net "/RFID_RST"
+        (wire
+          (path B.Cu 8000
+            958850 -984250
+            943214 -968614
+            622741 -968614
+            543577 -889450
+            543577 -787873
+            685800 -645650
+          )
+        )
+        (wire
+          (path B.Cu 8000
+            685800 -628650
+            685800 -645650
+          )
+        )
+      )
+      (net "/RFID_SCK"
+        (wire
+          (path B.Cu 8000
+            1085850 -984250
+            1041661 -940061
+            819411 -940061
+            762000 -882650
+          )
+        )
+      )
+      (net "/RFID_MISO"
+        (wire
+          (path F.Cu 8000
+            1035050 -984250
+            1005952 -955152
+            859902 -955152
+            787400 -882650
+          )
+        )
+      )
+      (net "/RFID_SS"
+        (wire
+          (path F.Cu 8000
+            609600 -628650
+            841652 -860702
+            987702 -860702
+            1111250 -984250
+          )
+        )
+      )
+      (net "/RFID_MOSI"
+        (wire
+          (path F.Cu 8000
+            914400 -882650
+            958850 -882650
+            1060450 -984250
+          )
+        )
+      )
+      (net "/I2C_SCL"
+        (wire
+          (path B.Cu 8000
+            889000 -882650
+            889000 -800100
+            1079500 -609600
+          )
+        )
+      )
+      (net "/I2C_SDA"
+        (wire
+          (path B.Cu 8000
+            1104900 -609600
+            1090285 -594985
+            1072945 -594985
+            812800 -855130
+            812800 -882650
+          )
+        )
+      )
+      (net "/SERVO_SIG"
+        (wire
+          (path F.Cu 8000
+            1231900 -846200
+            1179849 -794149
+            902099 -794149
+            736600 -628650
+          )
+        )
+      )
+      (net "/BUZZER_NEG "
+        (wire
+          (path F.Cu 8000
+            1257300 -706200
+            1270550 -706200
+          )
+        )
+        (wire
+          (path F.Cu 8000
+            1270550 -706200
+            1284767 -691983
+            1351634 -691983
+            1365250 -705599
+            1365250 -706500
+          )
+        )
+      )
+      (net "/BUZZER_BASE "
+        (wire
+          (path B.Cu 8000
+            1244600 -706200
+            1244600 -721700
+          )
+        )
+        (wire
+          (path B.Cu 8000
+            1244600 -721700
+            1164250 -721700
+            1136650 -749300
+          )
+        )
+      )
+      (net "/BUZZER_SIG"
+        (wire
+          (path F.Cu 8000
+            711200 -628650
+            726475 -613375
+            1062745 -613375
+            1122470 -673100
+            1136650 -673100
+          )
+        )
+      )
+    )
+  )
+)

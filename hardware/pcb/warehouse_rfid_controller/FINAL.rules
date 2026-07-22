@@ -1,0 +1,136 @@
+
+(rules PCB FINAL.dsn
+  (snap_angle 
+    fortyfive_degree
+  )
+  (rule
+    (width 450.0)
+    (clearance 400.0)
+    (clearance 225.0 (type smd_to_turn_gap))
+    (clearance 100.0 (type smd))
+    (clearance 400.0 (type "kicad_default"))
+    (clearance 400.0 (type "3V3,Default"))
+    (clearance 400.0 (type "5V,Default"))
+    (clearance 400.0 (type GND,Default))
+  )
+  (padstack "Via[0-1]_1600:800_um"
+    (shape
+      (circle F.Cu 1600.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 1600.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (padstack "Via[0-1]_1800:900_um"
+    (shape
+      (circle F.Cu 1800.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 1800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_1600:800_um" "Via[0-1]_1600:800_um" default
+  )
+  (via 
+    "Via[0-1]_1800:900_um" "Via[0-1]_1800:900_um" default
+  )
+  (via 
+    "Via[0-1]_1600:800_um-kicad_default" "Via[0-1]_1600:800_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_1800:900_um-kicad_default" "Via[0-1]_1800:900_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_1600:800_um-3V3,Default" "Via[0-1]_1600:800_um" "3V3,Default"
+  )
+  (via 
+    "Via[0-1]_1800:900_um-3V3,Default" "Via[0-1]_1800:900_um" "3V3,Default"
+  )
+  (via 
+    "Via[0-1]_1600:800_um-5V,Default" "Via[0-1]_1600:800_um" "5V,Default"
+  )
+  (via 
+    "Via[0-1]_1800:900_um-5V,Default" "Via[0-1]_1800:900_um" "5V,Default"
+  )
+  (via 
+    "Via[0-1]_1600:800_um-GND,Default" "Via[0-1]_1600:800_um" GND,Default
+  )
+  (via 
+    "Via[0-1]_1800:900_um-GND,Default" "Via[0-1]_1800:900_um" GND,Default
+  )
+  (via_rule
+    default "Via[0-1]_1600:800_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_1600:800_um-kicad_default"
+  )
+  (via_rule
+    "3V3,Default" "Via[0-1]_1600:800_um-3V3,Default"
+  )
+  (via_rule
+    "5V,Default" "Via[0-1]_1800:900_um-5V,Default"
+  )
+  (via_rule
+    GND,Default "Via[0-1]_1800:900_um-GND,Default"
+  )
+  (class default
+    (clearance_class default)
+    (via_rule default)
+    (rule
+      (width 450.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    "/I2C_SDA" "/I2C_SCL" "/BUZZER_SIG" "/BUZZER_BASE " "/SERVO_SIG" "/RFID_SS" "/RFID_SCK" "/RFID_MOSI"
+    "/RFID_MISO" "unconnected-(J2-Pin_5-Pad5)" "/RFID_RST" "/BUZZER_NEG " "unconnected-(U1-Pin_1-Pad1)" "unconnected-(U1-Pin_3-Pad3)" "unconnected-(U1-Pin_5-Pad5)" "unconnected-(U1-Pin_6-Pad6)"
+    "unconnected-(U1-Pin_7-Pad7)" "unconnected-(U1-Pin_8-Pad8)" "unconnected-(U1-Pin_9-Pad9)" "unconnected-(U1-Pin_11-Pad11)" "unconnected-(U1-Pin_13-Pad13)" "unconnected-(U1-Pin_16-Pad16)" "unconnected-(U1-Pin_18-Pad18)" "unconnected-(U1-Pin_20-Pad20)"
+    "unconnected-(U1-Pin_21-Pad21)" "unconnected-(U1-Pin_22-Pad22)" "unconnected-(U1-Pin_23-Pad23)" "unconnected-(U1-Pin_24-Pad24)" "unconnected-(U1-Pin_26-Pad26)"
+    (clearance_class "kicad_default")
+    (via_rule "kicad_default")
+    (rule
+      (width 450.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "3V3,Default"
+    /3V3
+    (clearance_class "3V3,Default")
+    (via_rule "3V3,Default")
+    (rule
+      (width 700.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "5V,Default"
+    /5V
+    (clearance_class "5V,Default")
+    (via_rule "5V,Default")
+    (rule
+      (width 900.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class GND,Default
+    /GND
+    (clearance_class GND,Default)
+    (via_rule GND,Default)
+    (rule
+      (width 1000.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)

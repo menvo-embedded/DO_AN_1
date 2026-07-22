@@ -1,0 +1,95 @@
+warehouse-access-rfid-cv
+├── docs
+│   ├── diagrams
+│   │   └── README.md
+│   ├── proposal
+│   │   └── README.md
+│   └── report_assets
+│       └── README.md
+├── experiments
+│   └── old_tests
+│       └── README.md
+├── firmware
+│   ├── config
+│   │   └── device_config.example.h
+│   ├── examples
+│   │   └── test_oled
+│   │       └── README.md
+│   ├── include
+│   │   └── README.md
+│   ├── lib
+│   │   └── README.md
+│   ├── src
+│   │   └── main.cpp
+│   ├── platformio.ini
+│   └── README.md
+├── python_cv
+│   ├── assets
+│   │   └── sample_images
+│   │       └── README.md
+│   ├── config
+│   │   ├── settings.py
+│   │   └── thresholds.yaml
+│   ├── dashboard
+│   │   ├── __init__.py
+│   │   └── app.py
+│   ├── data
+│   │   ├── dataset_crops
+│   │   │   └── .gitkeep
+│   │   ├── dataset_raw
+│   │   │   └── .gitkeep
+│   │   ├── evaluation
+│   │   │   └── .gitkeep
+│   │   └── gallery
+│   │       └── .gitkeep
+│   ├── database
+│   │   ├── __init__.py
+│   │   ├── db.py
+│   │   └── models.py
+│   ├── detection
+│   │   ├── __init__.py
+│   │   └── detector.py
+│   ├── fusion
+│   │   ├── __init__.py
+│   │   └── matcher.py
+│   ├── models
+│   │   ├── yolo
+│   │   │   └── README.md
+│   │   └── .gitkeep
+│   ├── mqtt
+│   │   ├── __init__.py
+│   │   └── receiver.py
+│   ├── outputs
+│   │   ├── debug_frames
+│   │   │   └── .gitkeep
+│   │   ├── logs
+│   │   │   └── .gitkeep
+│   │   └── runs
+│   │       └── .gitkeep
+│   ├── reid
+│   │   ├── __init__.py
+│   │   ├── gallery.py
+│   │   ├── reid.py
+│   │   └── trainer.py
+│   ├── scripts
+│   │   ├── auto_crop_dataset.py
+│   │   ├── collect_gallery.py
+│   │   └── evaluate_pipeline.py
+│   ├── tests
+│   │   ├── __init__.py
+│   │   ├── test_detector_module.py
+│   │   ├── test_rtsp.py
+│   │   ├── test_webcam.py
+│   │   └── test_yolo_webcam.py
+│   ├── tracking
+│   │   ├── __init__.py
+│   │   └── tracker.py
+│   ├── utils
+│   │   ├── __init__.py
+│   │   └── logger.py
+│   ├── app.py
+│   └── README.md
+├── .env.example
+├── .gitignore
+├── README.md
+└── requirements.txt

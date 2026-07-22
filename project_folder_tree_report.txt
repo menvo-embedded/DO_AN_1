@@ -1,0 +1,433 @@
+﻿============================================================
+PROJECT FOLDER CHECK REPORT
+RFID + CAMERA AI WAREHOUSE ACCESS CONTROL
+Generated: 2026-05-15 12:58:04
+============================================================
+
+===== 1. CHECK ROOT FOLDERS =====
+
+[OK]      D:\warehouse-access-rfid-cv
+          Files: 17517 | Size: 2526.14 MB
+
+[OK]      D:\warehouse-access-rfid-cv\python_cv
+          Files: 9477 | Size: 2054.66 MB
+
+[OK]      D:\warehouse-access-rfid-cv\python_cv\outputs
+          Files: 8865 | Size: 1415.25 MB
+
+[OK]      D:\warehouse_dataset_v2
+          Files: 5034 | Size: 98.34 MB
+
+[OK]      D:\warehouse_dataset_v2\face_data_tieng_viet
+          Files: 1739 | Size: 26.38 MB
+
+[OK]      D:\warehouse_dataset_v2\face_train_final_en
+          Files: 1288 | Size: 20.86 MB
+
+[OK]      D:\FACE
+          Files: 3 | Size: 3984.05 MB
+
+[OK]      D:\FACE_DEGRADED_CANDIDATES
+          Files: 0 | Size: 0 MB
+
+[OK]      D:\FACE_DEGRADED_REVIEW_SORTED
+          Files: 0 | Size: 0 MB
+
+
+===== 2. MAIN PROJECT TREE =====
+
+
+------------------------------------------------------------
+D:\warehouse-access-rfid-cv
+------------------------------------------------------------
+├── .pio
+│   ├── build
+│   │   └── esp32dev
+│   └── libdeps
+│       └── esp32dev
+├── .pytest_cache
+│   └── v
+│       └── cache
+├── .venv
+│   ├── Include
+│   ├── Lib
+│   │   └── site-packages
+│   ├── Scripts
+│   └── share
+│       └── man
+├── .vscode
+├── _EXPORT_FOR_TEAM_AI
+│   ├── .vscode
+│   ├── archive
+│   │   └── cleanup_old_files
+│   ├── docs
+│   │   ├── diagrams
+│   │   ├── proposal
+│   │   └── report_assets
+│   ├── experiments
+│   │   └── old_tests
+│   ├── firmware
+│   │   ├── config
+│   │   ├── examples
+│   │   ├── include
+│   │   ├── lib
+│   │   └── src
+│   ├── hardware
+│   │   └── pcb
+│   ├── python_cv
+│   │   ├── assets
+│   │   ├── config
+│   │   ├── dashboard
+│   │   ├── database
+│   │   ├── detection
+│   │   ├── fusion
+│   │   ├── mqtt
+│   │   ├── reid
+│   │   ├── scripts
+│   │   ├── tests
+│   │   ├── tools
+│   │   ├── tracking
+│   │   └── utils
+│   └── warehouse-access-rfid-cv
+│       ├── firmware
+│       └── python_cv
+├── archive
+│   └── cleanup_old_files
+├── docs
+│   ├── diagrams
+│   ├── proposal
+│   └── report_assets
+├── experiments
+│   └── old_tests
+├── firmware
+│   ├── .pio
+│   │   ├── build
+│   │   └── libdeps
+│   ├── config
+│   ├── examples
+│   │   └── test_oled
+│   ├── include
+│   ├── lib
+│   └── src
+├── hardware
+│   └── pcb
+│       ├── gerber
+│       └── warehouse_rfid_controller
+├── python_cv
+│   ├── __pycache__
+│   ├── assets
+│   │   └── sample_images
+│   ├── config
+│   │   └── __pycache__
+│   ├── dashboard
+│   │   └── __pycache__
+│   ├── data
+│   │   ├── archive_old_gallery
+│   │   ├── dataset_crops
+│   │   ├── dataset_raw
+│   │   ├── evaluation
+│   │   ├── face_gallery
+│   │   ├── gallery
+│   │   └── gallery_backup_20260428_041306
+│   ├── database
+│   │   └── __pycache__
+│   ├── detection
+│   │   └── __pycache__
+│   ├── fusion
+│   │   └── __pycache__
+│   ├── models
+│   │   ├── insightface
+│   │   └── yolo
+│   ├── mqtt
+│   │   └── __pycache__
+│   ├── outputs
+│   │   ├── dataset_quality_audit
+│   │   ├── debug_frames
+│   │   ├── demo_evidence_zone_localization
+│   │   ├── demo_evidence_zone2_hybrid
+│   │   ├── final_demo
+│   │   ├── logs
+│   │   ├── perf_tests
+│   │   ├── reid_calibration
+│   │   ├── review_test_images
+│   │   ├── runs
+│   │   ├── standalone_webcam_hybrid_debug
+│   │   ├── video_quality_samples
+│   │   ├── zone2_hybrid_reid_video_test
+│   │   └── zone2_reid_debug
+│   ├── reid
+│   │   └── __pycache__
+│   ├── scripts
+│   │   └── __pycache__
+│   ├── tests
+│   │   └── __pycache__
+│   ├── tools
+│   │   └── __pycache__
+│   ├── tracking
+│   │   └── __pycache__
+│   └── utils
+│       └── __pycache__
+├── scripts
+└── warehouse-access-rfid-cv
+    ├── firmware
+    │   └── src
+    └── python_cv
+        ├── config
+        ├── database
+        ├── detection
+        ├── fusion
+        ├── mqtt
+        ├── reid
+        ├── tracking
+        └── utils
+
+------------------------------------------------------------
+D:\warehouse-access-rfid-cv\python_cv
+------------------------------------------------------------
+├── __pycache__
+├── assets
+│   └── sample_images
+├── config
+│   └── __pycache__
+├── dashboard
+│   └── __pycache__
+├── data
+│   ├── archive_old_gallery
+│   ├── dataset_crops
+│   │   ├── NV001
+│   │   └── unknown
+│   ├── dataset_raw
+│   ├── evaluation
+│   ├── face_gallery
+│   │   └── raw
+│   ├── gallery
+│   │   ├── NV001
+│   │   ├── NV002
+│   │   ├── NV003
+│   │   ├── NV004
+│   │   └── NV005
+│   └── gallery_backup_20260428_041306
+├── database
+│   └── __pycache__
+├── detection
+│   └── __pycache__
+├── fusion
+│   └── __pycache__
+├── models
+│   ├── insightface
+│   │   ├── buffalo_sc
+│   │   └── buffalo_sc_extracted
+│   └── yolo
+├── mqtt
+│   └── __pycache__
+├── outputs
+│   ├── dataset_quality_audit
+│   ├── debug_frames
+│   │   ├── build_face_gallery_from_dataset_crops
+│   │   ├── camera_probe
+│   │   ├── camera_probe_droidcam
+│   │   ├── camera_quality_test
+│   │   ├── face_recognition_zone1_rotate_test
+│   │   ├── face_recognition_zone1_test
+│   │   ├── face_recognition_zone2_test
+│   │   ├── insightface_gallery_enroll
+│   │   ├── insightface_zone2_identify
+│   │   └── insightface_zone2_test
+│   ├── demo_evidence_zone_localization
+│   ├── demo_evidence_zone2_hybrid
+│   ├── final_demo
+│   ├── logs
+│   ├── perf_tests
+│   ├── reid_calibration
+│   ├── review_test_images
+│   │   └── zone2_reid_debug
+│   ├── runs
+│   ├── standalone_webcam_hybrid_debug
+│   │   ├── 20260507_004134
+│   │   ├── 20260507_005750
+│   │   └── 20260507_010218
+│   ├── video_quality_samples
+│   │   └── VID20260503225026
+│   ├── zone2_hybrid_reid_video_test
+│   └── zone2_reid_debug
+│       ├── 20260504_012022
+│       └── 20260504_012159
+├── reid
+│   └── __pycache__
+├── scripts
+│   └── __pycache__
+├── tests
+│   └── __pycache__
+├── tools
+│   └── __pycache__
+├── tracking
+│   └── __pycache__
+└── utils
+    └── __pycache__
+
+------------------------------------------------------------
+D:\warehouse-access-rfid-cv\python_cv\outputs
+------------------------------------------------------------
+├── dataset_quality_audit
+├── debug_frames
+│   ├── build_face_gallery_from_dataset_crops
+│   │   ├── clean_test
+│   │   ├── gallery_train
+│   │   └── mixed_hard_test
+│   ├── camera_probe
+│   ├── camera_probe_droidcam
+│   ├── camera_quality_test
+│   ├── face_recognition_zone1_rotate_test
+│   ├── face_recognition_zone1_test
+│   ├── face_recognition_zone2_test
+│   ├── insightface_gallery_enroll
+│   │   ├── NV001
+│   │   └── NV005
+│   ├── insightface_zone2_identify
+│   └── insightface_zone2_test
+├── demo_evidence_zone_localization
+├── demo_evidence_zone2_hybrid
+├── final_demo
+├── logs
+├── perf_tests
+├── reid_calibration
+├── review_test_images
+│   └── zone2_reid_debug
+│       ├── 20260504_012022
+│       └── 20260504_012159
+├── runs
+├── standalone_webcam_hybrid_debug
+│   ├── 20260507_004134
+│   │   ├── annotated
+│   │   ├── crops
+│   │   └── frames
+│   ├── 20260507_005750
+│   │   ├── annotated
+│   │   ├── crops
+│   │   └── frames
+│   └── 20260507_010218
+│       ├── annotated
+│       ├── crops
+│       └── frames
+├── video_quality_samples
+│   └── VID20260503225026
+├── zone2_hybrid_reid_video_test
+└── zone2_reid_debug
+    ├── 20260504_012022
+    │   └── crops
+    └── 20260504_012159
+        └── crops
+
+------------------------------------------------------------
+D:\warehouse_dataset_v2
+------------------------------------------------------------
+├── audit_reports
+├── face_data_tieng_viet
+│   ├── _Loại_bỏ
+│   │   ├── Crop_lỗi
+│   │   ├── Không_thấy_mặt
+│   │   ├── Quá_mờ
+│   │   └── Sai_người
+│   ├── NV001_Mến
+│   │   ├── L1_Dễ_chính_diện_rõ_mặt
+│   │   ├── L2_Bình_thường_hơi_nghiêng
+│   │   ├── L3_Biến_thể_góc_mặt
+│   │   ├── L4_Khó_hợp_lệ
+│   │   └── L5_Rất_khó_hợp_lệ
+│   └── NV002_Đức
+│       ├── L1_Dễ_chính_diện_rõ_mặt
+│       ├── L2_Bình_thường_hơi_nghiêng
+│       ├── L3_Biến_thể_góc_mặt
+│       ├── L4_Khó_hợp_lệ
+│       └── L5_Rất_khó_hợp_lệ
+├── face_train_final_en
+│   ├── NV001_Men
+│   │   ├── L1_easy_front_clear
+│   │   ├── L2_normal_slight_angle
+│   │   ├── L3_pose_variation
+│   │   ├── L4_hard_valid
+│   │   └── L5_extreme_hard_valid
+│   └── NV002_Duc
+│       ├── L1_easy_front_clear
+│       ├── L2_normal_slight_angle
+│       ├── L3_pose_variation
+│       ├── L4_hard_valid
+│       └── L5_extreme_hard_valid
+└── face_train_layered
+    ├── _reject
+    │   ├── bad_crop
+    │   ├── no_face
+    │   ├── too_blur
+    │   └── wrong_person
+    ├── _to_sort_Men_Duc
+    │   ├── L1_easy_front_clear
+    │   ├── L2_normal_clean
+    │   ├── L3_pose_variation
+    │   ├── L4_hard_valid
+    │   └── L5_extreme_hard_valid
+    ├── NV001_Men
+    │   ├── L1_easy_front_clear
+    │   ├── L2_normal_clean
+    │   ├── L3_pose_variation
+    │   ├── L4_hard_valid
+    │   └── L5_extreme_hard_valid
+    └── NV002_Duc
+        ├── L1_easy_front_clear
+        ├── L2_normal_clean
+        ├── L3_pose_variation
+        ├── L4_hard_valid
+        └── L5_extreme_hard_valid
+
+------------------------------------------------------------
+D:\warehouse_dataset_v2\face_data_tieng_viet
+------------------------------------------------------------
+├── _Loại_bỏ
+│   ├── Crop_lỗi
+│   ├── Không_thấy_mặt
+│   ├── Quá_mờ
+│   └── Sai_người
+├── NV001_Mến
+│   ├── L1_Dễ_chính_diện_rõ_mặt
+│   ├── L2_Bình_thường_hơi_nghiêng
+│   ├── L3_Biến_thể_góc_mặt
+│   ├── L4_Khó_hợp_lệ
+│   └── L5_Rất_khó_hợp_lệ
+└── NV002_Đức
+    ├── L1_Dễ_chính_diện_rõ_mặt
+    ├── L2_Bình_thường_hơi_nghiêng
+    ├── L3_Biến_thể_góc_mặt
+    ├── L4_Khó_hợp_lệ
+    └── L5_Rất_khó_hợp_lệ
+
+------------------------------------------------------------
+D:\warehouse_dataset_v2\face_train_final_en
+------------------------------------------------------------
+├── NV001_Men
+│   ├── L1_easy_front_clear
+│   ├── L2_normal_slight_angle
+│   ├── L3_pose_variation
+│   ├── L4_hard_valid
+│   └── L5_extreme_hard_valid
+└── NV002_Duc
+    ├── L1_easy_front_clear
+    ├── L2_normal_slight_angle
+    ├── L3_pose_variation
+    ├── L4_hard_valid
+    └── L5_extreme_hard_valid
+
+------------------------------------------------------------
+D:\FACE
+------------------------------------------------------------
+
+------------------------------------------------------------
+D:\FACE_DEGRADED_CANDIDATES
+------------------------------------------------------------
+
+------------------------------------------------------------
+D:\FACE_DEGRADED_REVIEW_SORTED
+------------------------------------------------------------
+
+============================================================
+REPORT SAVED TO:
+D:\warehouse-access-rfid-cv\project_folder_tree_report.txt
+============================================================

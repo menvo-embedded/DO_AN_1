@@ -1,0 +1,1023 @@
+﻿
+
+==================== FILE: main.py ====================
+
+# python_cv/main.py
+"""
+Entry point — chạy toàn bộ pipeline:
+  Thread 1 (daemon) : MQTT listener
+  Thread 2 (daemon) : Camera Zone 2 (RTSP Imou)
+  Thread 3 (daemon) : Camera Zone 3 (RTSP)
+  Thread 4 (daemon) : Flask dashboard
+  Main thread       : Camera Zone 1 (webcam USB — blocking, có GUI)
+"""
+
+import sys
+import threading
+import signal
+import random
+import cv2
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from config.settings        import FLASK_PORT
+from database.database      import Database
+from reid.reid_engine       import ReIDEngine
+from reid.gallery           import Gallery
+from fusion.fusion_layer    import FusionLayer
+from mqtt.mqtt_listener     import RFIDListener
+from detection.camera_zone1 import CameraZone1
+from detection.camera_zone2 import CameraZone2
+from detection.camera_zone3 import CameraZone3
+from dashboard.app          import run_dashboard
+from utils.logger           import get_logger
+
+log = get_logger("main")
+
+DATASET_ROOT   = Path("F:/warehouse_dataset/dataset_crops")
+VALID_CLASSES  = ["NV001","NV002","NV003","NV004","NV005"]
+GALLERY_PRELOAD = 30  # so anh/nguoi khi preload
+
+
+def preload_gallery(gallery: Gallery, reid: ReIDEngine):
+    """Load san gallery tu dataset truoc khi chay realtime."""
+    if gallery.employees():
+        log.info(f"Gallery already loaded: {gallery.employees()}")
+        return
+    total = 0
+    for nv in VALID_CLASSES:
+        folder = DATASET_ROOT / nv
+        if not folder.exists():
+            log.warning(f"Dataset folder not found: {folder}")
+            continue
+        imgs = list(folder.glob("*.jpg"))
+        if not imgs:
+            continue
+        samples = random.sample(imgs, min(GALLERY_PRELOAD, len(imgs)))
+        for p in samples:
+            img = cv2.imread(str(p))
+            if img is None:
+                continue
+            emb = reid.get_embedding(img)
+            if emb is not None:
+                gallery.update(nv, emb)
+                total += 1
+    log.info(f"Gallery pre-loaded: {total} embeddings | {gallery.employees()}")
+
+
+def main():
+    log.info("=" * 50)
+    log.info("Warehouse RFID+CV System starting")
+    log.info("=" * 50)
+
+    # ── Init core components ─────────────────────────────────────────────────
+    db      = Database()
+    reid    = ReIDEngine()
+    gallery = Gallery()
+
+    # Pre-load gallery tu dataset
+    preload_gallery(gallery, reid)
+
+    fusion  = FusionLayer(reid, gallery, db)
+
+    # ── Thread 1: MQTT ───────────────────────────────────────────────────────
+    mqtt = RFIDListener(on_event=fusion.on_rfid_event)
+    mqtt.start()
+
+    # ── Thread 2: Zone 2 RTSP ────────────────────────────────────────────────
+    cam2 = CameraZone2(fusion)
+    t_cam2 = threading.Thread(
+        target=cam2.run, name="zone2-camera", daemon=True)
+    t_cam2.start()
+
+    # ── Thread 3: Zone 3 RTSP ────────────────────────────────────────────────
+    cam3 = CameraZone3(fusion)
+    t_cam3 = threading.Thread(
+        target=cam3.run, name="zone3-camera", daemon=True)
+    t_cam3.start()
+
+    # ── Thread 4: Dashboard ──────────────────────────────────────────────────
+    t_dash = threading.Thread(
+        target=run_dashboard, args=(db,), name="dashboard", daemon=True)
+    t_dash.start()
+    log.info(f"Dashboard: http://localhost:{FLASK_PORT}")
+
+    # ── Graceful shutdown ────────────────────────────────────────────────────
+    def _shutdown(sig, frame):
+        log.info("Shutdown signal received")
+        cam1.stop()
+        cam2.stop()
+        cam3.stop()
+        mqtt.stop()
+        db.close()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT,  _shutdown)
+    signal.signal(signal.SIGTERM, _shutdown)
+
+    # ── Main thread: Zone 1 webcam (blocking) ────────────────────────────────
+    cam1 = CameraZone1(fusion)
+    cam1.run()  # Nhan 'q' tren cua so Zone 1 de thoat
+
+
+if __name__ == "__main__":
+    main()
+
+
+==================== FILE: config\settings.py ====================
+
+import os
+from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
+
+
+# ============================================================
+# PATHS
+# ============================================================
+
+ROOT = Path(__file__).parent.parent  # python_cv/
+
+if load_dotenv is not None:
+    load_dotenv(ROOT / ".env")
+
+MODELS_DIR = ROOT / "models"
+GALLERY_DIR = ROOT / "data" / "gallery"
+DB_PATH = ROOT / "outputs" / "warehouse.db"
+LOG_DIR = ROOT / "outputs" / "logs"
+DEBUG_DIR = ROOT / "outputs" / "debug_frames"
+
+YOLO_WEIGHTS = ROOT.parent / "yolo11n-seg.pt"
+
+
+# ============================================================
+# MQTT
+# ============================================================
+
+MQTT_BROKER = os.getenv("MQTT_BROKER", "192.168.1.115")
+MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
+MQTT_TOPIC = os.getenv("MQTT_TOPIC", "warehouse/rfid/scan")
+MQTT_CLIENT = os.getenv("MQTT_CLIENT", "pc-warehouse-server")
+
+
+# ============================================================
+# CAMERA
+# ============================================================
+# Zone 1: webcam / USB camera nếu còn dùng
+# Zone 2: IP camera 192.168.1.3
+# Zone 3: IP camera 192.168.1.4
+#
+# Realtime nên dùng subtype=1 cho nhẹ.
+# Khi thu data nét hơn có thể đổi subtype=0 trong .env.
+
+CAM_ZONE1_INDEX = int(os.getenv("CAM_ZONE1_INDEX", "3"))
+
+CAM_ZONE2_RTSP = os.getenv(
+    "CAM_ZONE2_RTSP",
+    "rtsp://admin:password@192.168.1.3:554/cam/realmonitor?channel=1&subtype=1",
+)
+
+CAM_ZONE3_RTSP = os.getenv(
+    "CAM_ZONE3_RTSP",
+    "rtsp://admin:password@192.168.1.4:554/cam/realmonitor?channel=1&subtype=1",
+)
+
+CAMERA_STREAMS = {
+    "zone1": {
+        "name": "Webcam / Cong RFID",
+        "type": "webcam",
+        "source": CAM_ZONE1_INDEX,
+        "enabled": True,
+    },
+    "zone2": {
+        "name": "IP Camera 192.168.1.3",
+        "type": "rtsp",
+        "source": CAM_ZONE2_RTSP,
+        "enabled": True,
+    },
+    "zone3": {
+        "name": "IP Camera 192.168.1.4",
+        "type": "rtsp",
+        "source": CAM_ZONE3_RTSP,
+        "enabled": True,
+    },
+}
+
+
+# ============================================================
+# YOLO
+# ============================================================
+
+YOLO_CONF = float(os.getenv("YOLO_CONF", "0.4"))
+YOLO_IOU = float(os.getenv("YOLO_IOU", "0.5"))
+YOLO_CLASSES = [0]  # person only
+YOLO_IMG_SIZE = int(os.getenv("YOLO_IMG_SIZE", "640"))
+
+
+# ============================================================
+# TRACKING
+# ============================================================
+
+TRACKER_TYPE = os.getenv("TRACKER_TYPE", "bytetrack")  # bytetrack | botsort
+
+
+# ============================================================
+# ENTRY LINE ZONE 1
+# ============================================================
+# Pixel Y chia frame webcam làm 2 nửa. Chỉnh theo thực tế khi setup.
+
+ENTRY_LINE_Y = int(os.getenv("ENTRY_LINE_Y", "250"))
+
+
+# ============================================================
+# FUSION RFID + RE-ID
+# ============================================================
+
+FUSION_TIME_WINDOW = float(os.getenv("FUSION_TIME_WINDOW", "10.0"))
+FUSION_THRESHOLD = float(os.getenv("FUSION_THRESHOLD", "0.30"))
+FUSION_WEIGHT_TIME = float(os.getenv("FUSION_WEIGHT_TIME", "0.4"))
+FUSION_WEIGHT_REID = float(os.getenv("FUSION_WEIGHT_REID", "0.6"))
+
+
+# ============================================================
+# RE-ID
+# ============================================================
+
+REID_MODEL_NAME = os.getenv("REID_MODEL_NAME", "osnet_x1_0")
+REID_INPUT_SIZE = (128, 256)  # (W, H)
+REID_GALLERY_SIZE = int(os.getenv("REID_GALLERY_SIZE", "50"))
+REID_MATCH_THRESHOLD = float(os.getenv("REID_MATCH_THRESHOLD", "0.30"))
+# Model fine-tuned ResNet50 V3 clean-val
+REID_FINETUNED_PATH = os.getenv(
+    "REID_FINETUNED_PATH",
+    "models/reid_resnet50_v3_cleanval.pth",
+)
+
+
+# ============================================================
+# UID -> EMPLOYEE MAPPING
+# ============================================================
+# Cập nhật khi enroll thẻ mới.
+# Hiện tại model V3 chỉ học 5 class NV001–NV005.
+
+UID_MAP = {
+    "03F76328": "NV001",  # Bo Man
+    "23FCDA26": "NV002",  # Me Mai
+    "F3AC7128": "NV003",  # Anh Minh
+    "438DFE27": "NV004",  # Chi Dung
+    "95B0F605": "NV005",  # Toi
+}
+
+EMPLOYEE_NAMES = {
+    "NV001": "Bo Man",
+    "NV002": "Me Mai",
+    "NV003": "Anh Minh",
+    "NV004": "Chi Dung",
+    "NV005": "Toi",
+}
+
+
+# ============================================================
+# DASHBOARD
+# ============================================================
+
+FLASK_HOST = os.getenv("FLASK_HOST", "0.0.0.0")
+FLASK_PORT = int(os.getenv("FLASK_PORT", "5000"))
+FLASK_DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
+
+
+# ============================================================
+# ENSURE OUTPUT DIRS EXIST
+# ============================================================
+
+for _d in (GALLERY_DIR, DB_PATH.parent, LOG_DIR, DEBUG_DIR):
+    _d.mkdir(parents=True, exist_ok=True)
+
+
+==================== FILE: fusion\fusion_layer.py ====================
+
+from collections import deque
+from datetime import datetime
+import threading
+import time
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+from config.settings import (
+    UID_MAP, FUSION_TIME_WINDOW, FUSION_THRESHOLD,
+    FUSION_WEIGHT_TIME, FUSION_WEIGHT_REID,
+)
+from reid.reid_engine  import ReIDEngine
+from reid.gallery      import Gallery
+from database.database import Database
+from utils.logger      import get_logger
+
+log = get_logger("fusion")
+RFID_EXPIRE_WINDOW = 15.0
+INTRUDER_WINDOW = 15.0
+PROXY_THRESHOLD    = 0.45
+
+
+class FusionLayer:
+    def __init__(self, reid, gallery, db):
+        self.reid    = reid
+        self.gallery = gallery
+        self.db      = db
+        self._pending             = {}
+        self._confirmed           = {}
+        self._crossings           = deque(maxlen=50)
+        self._unmatched_crossings = deque(maxlen=50)
+        threading.Thread(target=self._cleanup_loop, daemon=True).start()
+
+    def on_rfid_event(self, event):
+        uid    = event["uid"]
+        ts     = event["dt"]
+        emp_id = UID_MAP.get(uid.upper())
+        self.db.log_rfid_event(uid, emp_id, ts.isoformat(),
+                               event.get("device",""), event.get("zone",1))
+        if emp_id is None:
+            log.warning(f"Unknown UID: {uid}")
+            self.db.log_anomaly("unknown_uid", None, None, f"uid={uid}", ts)
+            return
+        if emp_id not in self._pending:
+            self._pending[emp_id] = deque(maxlen=5)
+        self._pending[emp_id].append({
+            "ts": ts, "uid": uid,
+            "expires": time.time() + RFID_EXPIRE_WINDOW,
+        })
+        log.info(f"Pending: {emp_id} @ {ts.strftime('%H:%M:%S')}")
+        self._hungarian_match()
+
+    def on_entry_crossing(self, track_id, crop_bgr, timestamp):
+        emb = self.reid.get_embedding(crop_bgr)
+        entry = {
+            "track_id": track_id, "ts": timestamp,
+            "time": time.time(), "embedding": emb, "assigned": False,
+        }
+        self._crossings.append(entry)
+        self._unmatched_crossings.append(entry)
+        self._hungarian_match()
+
+    def identify_zone2(self, track_id, crop_bgr):
+        emp_id = self.reid.identify(crop_bgr, self.gallery.all())
+        if emp_id:
+            self._confirmed[track_id] = emp_id
+            log.info(f"Zone2 re-id: track_{track_id} -> {emp_id}")
+            self.db.update_presence(emp_id, 2, track_id)
+        return emp_id
+
+    def get_label(self, track_id):
+        return self._confirmed.get(track_id, f"track_{track_id}")
+
+    def is_confirmed(self, track_id):
+        return track_id in self._confirmed
+
+    def _hungarian_match(self):
+        now = time.time()
+        pending_list = [
+            (emp_id, q[-1])
+            for emp_id, q in self._pending.items()
+            if q and now < q[-1]["expires"]
+        ]
+        unassigned = [c for c in self._crossings if not c["assigned"]]
+        if not pending_list or not unassigned:
+            return
+        N, M = len(pending_list), len(unassigned)
+        cost = np.full((N, M + N), 1e6)
+        for i, (emp_id, rfid) in enumerate(pending_list):
+            cost[i][M + i] = 1.0 - FUSION_THRESHOLD
+            for j, crossing in enumerate(unassigned):
+                dt = abs((crossing["ts"] - rfid["ts"]).total_seconds())
+                if dt > FUSION_TIME_WINDOW:
+                    continue
+                gallery_embeds = self.gallery.get(emp_id)
+                if gallery_embeds and crossing["embedding"] is not None:
+                    app_score = self.reid.match_score(
+                        crossing["embedding"], gallery_embeds)
+                else:
+                    app_score = 0.5
+                time_score  = 1.0 - (dt / FUSION_TIME_WINDOW)
+                total_score = (FUSION_WEIGHT_TIME * time_score
+                               + FUSION_WEIGHT_REID * app_score)
+                cost[i][j] = 1.0 - total_score
+        row_ind, col_ind = linear_sum_assignment(cost)
+        for i, j in zip(row_ind, col_ind):
+            emp_id = pending_list[i][0]
+            if j < M:
+                score = 1.0 - cost[i][j]
+                if score >= FUSION_THRESHOLD:
+                    crossing = unassigned[j]
+                    tid = crossing["track_id"]
+                    self._confirmed[tid] = emp_id
+                    crossing["assigned"] = True
+                    self._unmatched_crossings = deque(
+                        [c for c in self._unmatched_crossings
+                         if c["track_id"] != tid], maxlen=50)
+                    self._pending[emp_id].clear()
+                    if crossing["embedding"] is not None:
+                        self.gallery.update(emp_id, crossing["embedding"])
+                    self.db.log_entry(emp_id, tid, crossing["ts"], score)
+                    log.info(f"CONFIRMED: track_{tid} -> {emp_id} (score={score:.3f})")
+                    self.db.update_presence(emp_id, 1, tid)
+                    if score < PROXY_THRESHOLD:
+                        log.warning(f"PROXY SWIPE: {emp_id} score={score:.3f}")
+                        self.db.log_anomaly("proxy_swipe", emp_id, tid,
+                            f"Low score={score:.3f}", crossing["ts"])
+                else:
+                    log.debug(f"No match for {emp_id} (best={score:.3f})")
+
+    def _cleanup_loop(self):
+        while True:
+            time.sleep(3)
+            now = time.time()
+            remove_list = []
+            for crossing in list(self._unmatched_crossings):
+                if crossing["assigned"]:
+                    remove_list.append(crossing)
+                    continue
+                age = now - crossing["time"]
+                if age > INTRUDER_WINDOW:
+                    tid = crossing["track_id"]
+                    log.warning(f"INTRUDER ALERT: track_{tid} no RFID ({age:.0f}s)")
+                    self.db.log_anomaly("no_rfid_intruder", None, tid,
+                        f"No RFID after {age:.0f}s", crossing["ts"])
+                    remove_list.append(crossing)
+            for c in remove_list:
+                try:
+                    self._unmatched_crossings.remove(c)
+                except ValueError:
+                    pass
+            for emp_id, q in list(self._pending.items()):
+                if not q:
+                    continue
+                if now > q[-1]["expires"]:
+                    log.warning(f"RFID TIMEOUT: {emp_id} no crossing")
+                    self.db.log_anomaly("rfid_no_crossing", emp_id, None,
+                        f"No crossing within {RFID_EXPIRE_WINDOW}s", q[-1]["ts"])
+                    q.clear()
+
+
+==================== FILE: reid\reid_engine.py ====================
+
+import numpy as np
+import torch
+import torch.nn as nn
+import cv2
+import torchreid
+import onnxruntime as ort
+from pathlib import Path
+from torchvision import models as tv_models
+
+from config.settings import REID_MODEL_NAME, REID_INPUT_SIZE, REID_MATCH_THRESHOLD
+from utils.logger import get_logger
+
+log = get_logger("reid")
+
+_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+_STD  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+
+FACE_DET_MODEL = "models/insightface/buffalo_sc/det_500m.onnx"
+FACE_REC_MODEL = "models/insightface/buffalo_sc/w600k_mbf.onnx"
+FINETUNED_PATH = "models/reid_resnet50_v3_engine.pth"
+NUM_CLASSES    = 5
+
+# Body:Face ratio trong hybrid embedding
+BODY_W = 0.6
+FACE_W = 0.4
+
+
+class ReIDEngine:
+    def __init__(self):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        log.info(f"Loading {REID_MODEL_NAME} on {self.device}")
+
+        # OSNet (dung de fallback)
+        self.model = torchreid.models.build_model(
+            name=REID_MODEL_NAME,
+            num_classes=1000,
+            pretrained=True,
+        )
+        self.model.eval().to(self.device)
+
+        # Fine-tuned ResNet50 v3
+        self.finetuned_model = None
+        self._load_finetuned()
+
+        # AdaFace
+        self.face_det = None
+        self.face_rec = None
+        self._load_adaface()
+
+        # OpenCV face detector (de crop mat tu toan than)
+        self.cv_face_det = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        )
+
+        log.info("ReIDEngine ready (ResNet50-FT + AdaFace + HaarCascade)")
+
+    def _load_finetuned(self):
+        path = Path(FINETUNED_PATH)
+        if not path.exists():
+            log.warning(f"Fine-tuned model not found: {path}")
+            return
+        try:
+            base = tv_models.resnet50(weights=None)
+            base.fc = nn.Identity()
+            state = torch.load(str(path), map_location=self.device)
+            new_state = {}
+            for k, v in state.items():
+                nk = k
+                for prefix in ["module.", "model.", "backbone."]:
+                    if nk.startswith(prefix):
+                        nk = nk[len(prefix):]
+                new_state[nk] = v
+            missing, _ = base.load_state_dict(new_state, strict=False)
+            real_missing = [k for k in missing if not k.startswith("fc.")]
+            if real_missing:
+                log.warning(f"Missing keys: {real_missing[:5]}")
+            base.eval().to(self.device)
+            self.finetuned_model = base
+            log.info("Fine-tuned ResNet50 v3 loaded OK (2048d embedding)")
+        except Exception as e:
+            log.warning(f"Fine-tuned load failed: {e}")
+
+    def _load_adaface(self):
+        try:
+            providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+            opts = ort.SessionOptions()
+            opts.log_severity_level = 3
+            det_path = Path(FACE_DET_MODEL)
+            rec_path = Path(FACE_REC_MODEL)
+            if det_path.exists() and rec_path.exists():
+                self.face_det = ort.InferenceSession(
+                    str(det_path), sess_options=opts, providers=providers)
+                self.face_rec = ort.InferenceSession(
+                    str(rec_path), sess_options=opts, providers=providers)
+                log.info("AdaFace loaded on GPU")
+            else:
+                log.warning("AdaFace models not found")
+        except Exception as e:
+            log.warning(f"AdaFace load failed: {e}")
+
+    def _crop_face_from_body(self, body_bgr: np.ndarray) -> np.ndarray | None:
+        """
+        Crop khuon mat tu anh toan than.
+        Thu HaarCascade truoc (nhanh), neu ko thay thi crop 1/3 tren cua body.
+        """
+        if body_bgr is None or body_bgr.size == 0:
+            return None
+
+        h, w = body_bgr.shape[:2]
+
+        # 1. Thu HaarCascade
+        gray  = cv2.cvtColor(body_bgr, cv2.COLOR_BGR2GRAY)
+        faces = self.cv_face_det.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=3, minSize=(20, 20))
+
+        if len(faces) > 0:
+            # Lay mat lon nhat
+            fx, fy, fw, fh = max(faces, key=lambda f: f[2]*f[3])
+            pad = int(0.2 * min(fw, fh))
+            x1 = max(0, fx - pad)
+            y1 = max(0, fy - pad)
+            x2 = min(w, fx + fw + pad)
+            y2 = min(h, fy + fh + pad)
+            face_crop = body_bgr[y1:y2, x1:x2]
+            if face_crop.size > 0:
+                return face_crop
+
+        # 2. Fallback: crop 1/3 tren (vung dau/mat)
+        top_h = max(30, h // 3)
+        face_crop = body_bgr[:top_h, :]
+        if face_crop.size > 0:
+            return face_crop
+
+        return None
+
+    @torch.no_grad()
+    def get_embedding(self, crop_bgr: np.ndarray) -> np.ndarray | None:
+        if crop_bgr is None or crop_bgr.size == 0:
+            return None
+        try:
+            # ── Body embedding (ResNet50 fine-tuned) ─────────────────────────
+            body_emb = None
+            if self.finetuned_model is not None:
+                img2 = cv2.resize(crop_bgr, (224, 224))
+                img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
+                img2 = (img2 - _MEAN) / _STD
+                t2   = torch.from_numpy(img2).permute(2, 0, 1).unsqueeze(0).to(self.device)
+                ft_feat = self.finetuned_model(t2)
+                ft_feat = ft_feat / (ft_feat.norm(dim=1, keepdim=True) + 1e-8)
+                body_emb = ft_feat.squeeze(0).cpu().numpy()
+            else:
+                # Fallback OSNet
+                w, h = REID_INPUT_SIZE
+                img = cv2.resize(crop_bgr, (w, h))
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
+                img = (img - _MEAN) / _STD
+                tensor = torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0).to(self.device)
+                feat = self.model(tensor)
+                feat = feat / feat.norm(dim=1, keepdim=True)
+                body_emb = feat.squeeze(0).cpu().numpy()
+
+            # ── Face embedding (AdaFace) ──────────────────────────────────────
+            if self.face_det is not None:
+                face_crop = self._crop_face_from_body(crop_bgr)
+                if face_crop is not None:
+                    face_emb = self._get_face_embedding(face_crop)
+                    if face_emb is not None:
+                        log.info(f"Face detected — hybrid embedding")
+                        min_dim  = min(len(body_emb), len(face_emb))
+                        combined = (body_emb[:min_dim] * BODY_W
+                                    + face_emb[:min_dim] * FACE_W)
+                        return combined / (np.linalg.norm(combined) + 1e-8)
+
+            return body_emb / (np.linalg.norm(body_emb) + 1e-8)
+
+        except Exception as e:
+            log.error(f"Embedding error: {e}")
+            return None
+
+    def _get_face_embedding(self, face_bgr: np.ndarray) -> np.ndarray | None:
+        """AdaFace inference tren anh mat da crop san."""
+        try:
+            # Detection
+            det_img = cv2.resize(face_bgr, (320, 320))
+            det_img = cv2.cvtColor(det_img, cv2.COLOR_BGR2RGB).astype(np.float32)
+            det_img = (det_img - 127.5) / 128.0
+            det_img = det_img.transpose(2, 0, 1)[np.newaxis]
+            det_input  = self.face_det.get_inputs()[0].name
+            det_output = self.face_det.run(None, {det_input: det_img})
+            scores = det_output[0][0] if len(det_output) > 0 else []
+            if len(scores) == 0 or float(scores[0]) < 0.1:
+                return None
+            log.info(f"AdaFace score={float(scores[0]):.3f}")
+
+            # Recognition
+            rec_img = cv2.resize(face_bgr, (112, 112))
+            rec_img = cv2.cvtColor(rec_img, cv2.COLOR_BGR2RGB).astype(np.float32)
+            rec_img = (rec_img - 127.5) / 128.0
+            rec_img = rec_img.transpose(2, 0, 1)[np.newaxis]
+            rec_input = self.face_rec.get_inputs()[0].name
+            face_feat = self.face_rec.run(None, {rec_input: rec_img})[0][0]
+            return face_feat / (np.linalg.norm(face_feat) + 1e-8)
+        except Exception:
+            return None
+
+    def match_score(self, query: np.ndarray, gallery_embeds: list) -> float:
+        if not gallery_embeds or query is None:
+            return 0.0
+        mat     = np.stack(gallery_embeds)
+        min_dim = min(mat.shape[1], len(query))
+        scores  = mat[:, :min_dim] @ query[:min_dim]
+        return float(scores.max())
+
+    def identify(self, crop_bgr: np.ndarray, gallery: dict) -> str | None:
+        emb = self.get_embedding(crop_bgr)
+        if emb is None:
+            return None
+        best_id, best_score = None, REID_MATCH_THRESHOLD
+        for emp_id, embeds in gallery.items():
+            if not embeds:
+                continue
+            score = self.match_score(emb, embeds)
+            if score > best_score:
+                best_score, best_id = score, emp_id
+        return best_id
+
+
+
+==================== FILE: reid\gallery.py ====================
+
+import pickle
+from collections import deque
+from pathlib import Path
+import numpy as np
+from config.settings import GALLERY_DIR, REID_GALLERY_SIZE
+from utils.logger import get_logger
+
+log = get_logger("gallery")
+GALLERY_FILE = GALLERY_DIR / "gallery.pkl"
+
+class Gallery:
+    def __init__(self):
+        self._data: dict[str, deque] = {}
+        self._load()
+
+    def update(self, employee_id: str, embedding: np.ndarray):
+        if employee_id not in self._data:
+            self._data[employee_id] = deque(maxlen=REID_GALLERY_SIZE)
+        self._data[employee_id].append(embedding)
+        self._save()
+
+    def get(self, employee_id: str) -> list:
+        return list(self._data.get(employee_id, []))
+
+    def all(self) -> dict:
+        return {k: list(v) for k, v in self._data.items()}
+
+    def employees(self) -> list:
+        return list(self._data.keys())
+
+    def size(self, employee_id: str) -> int:
+        return len(self._data.get(employee_id, []))
+
+    def _save(self):
+        try:
+            with open(GALLERY_FILE, "wb") as f:
+                pickle.dump({k: list(v) for k, v in self._data.items()}, f)
+        except Exception as e:
+            log.error(f"Gallery save error: {e}")
+
+    def _load(self):
+        if GALLERY_FILE.exists():
+            try:
+                with open(GALLERY_FILE, "rb") as f:
+                    raw = pickle.load(f)
+                self._data = {k: deque(v, maxlen=REID_GALLERY_SIZE) for k, v in raw.items()}
+                log.info(f"Gallery loaded: {list(self._data.keys())}")
+            except Exception as e:
+                log.warning(f"Gallery load failed ({e}) - starting fresh")
+                self._data = {}
+        else:
+            log.info("No gallery file - starting fresh")
+
+
+
+==================== FILE: detection\camera_zone1.py ====================
+
+import time
+from datetime import datetime
+import cv2
+import numpy as np
+from supervision import Detections
+from ultralytics import YOLO
+from config.settings import (
+    CAM_ZONE1_INDEX, YOLO_WEIGHTS,
+    YOLO_CONF, YOLO_CLASSES,
+)
+from tracking.tracker import Tracker
+from fusion.fusion_layer import FusionLayer
+from utils.logger import get_logger
+
+log = get_logger("zone1")
+COLOR_CONFIRMED = (0, 220, 80)
+COLOR_PENDING   = (0, 165, 255)
+COLOR_LINE      = (0, 0, 220)
+CROSSING_COOLDOWN = 3.0  # giây
+
+class CameraZone1:
+    def __init__(self, fusion: FusionLayer):
+        self.fusion  = fusion
+        self.model   = YOLO(str(YOLO_WEIGHTS))
+        self.tracker = Tracker()
+        self._prev_cx: dict[int, float] = {}
+        self._last_crossing: dict[int, float] = {}
+        self._running = False
+
+    def run(self):
+        cap = cv2.VideoCapture(CAM_ZONE1_INDEX)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH,  640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        if not cap.isOpened():
+            log.error(f"Cannot open webcam index {CAM_ZONE1_INDEX}")
+            return
+        log.info(f"Zone 1 camera started (index={CAM_ZONE1_INDEX})")
+        self._running = True
+        while self._running:
+            ret, frame = cap.read()
+            if not ret:
+                log.warning("Zone1: frame read failed - retry")
+                continue
+            frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+            annotated = self._process(frame)
+            cv2.imshow("Zone 1 - Door", annotated)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+        cap.release()
+        cv2.destroyWindow("Zone 1 - Door")
+
+    def stop(self):
+        self._running = False
+
+    def _process(self, frame: np.ndarray) -> np.ndarray:
+        h, w = frame.shape[:2]
+        ENTRY_LINE_X = w // 2
+
+        results = self.model(frame, classes=YOLO_CLASSES,
+                             conf=YOLO_CONF, verbose=False)[0]
+        dets    = Detections.from_ultralytics(results)
+        tracked = self.tracker.update(dets)
+        now     = datetime.now().astimezone()
+        now_ts  = time.time()
+
+        for i, track_id in enumerate(
+            tracked.tracker_id if tracked.tracker_id is not None else []
+        ):
+            x1, y1, x2, y2 = tracked.xyxy[i].astype(int)
+            cx = float((x1 + x2) / 2)
+            prev_cx = self._prev_cx.get(track_id, cx)
+
+            crossed = (prev_cx < ENTRY_LINE_X <= cx or
+                       prev_cx > ENTRY_LINE_X >= cx)
+
+            last_cross_ts = self._last_crossing.get(track_id, 0)
+            if crossed and (now_ts - last_cross_ts) > CROSSING_COOLDOWN:
+                self._last_crossing[track_id] = now_ts
+                log.info(f"CROSSING: track_{track_id} cx={cx:.0f} prev={prev_cx:.0f} line={ENTRY_LINE_X}")
+                crop = frame[max(0,y1):y2, max(0,x1):x2]
+                if crop.size > 0:
+                    self.fusion.on_entry_crossing(track_id, crop, now)
+
+            self._prev_cx[track_id] = cx
+
+            label = self.fusion.get_label(track_id)
+            color = COLOR_CONFIRMED if self.fusion.is_confirmed(track_id) else COLOR_PENDING
+            cv2.rectangle(frame, (x1,y1), (x2,y2), color, 2)
+            cv2.putText(frame, f"{label} cx={cx:.0f}", (x1, y1-8),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 2)
+
+        cv2.line(frame, (ENTRY_LINE_X, 0), (ENTRY_LINE_X, h), COLOR_LINE, 2)
+        cv2.putText(frame, f"ENTRY LINE x={ENTRY_LINE_X}", (ENTRY_LINE_X+5, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLOR_LINE, 1)
+        cv2.putText(frame, "ZONE 1", (8, 24),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+        return frame
+
+
+
+==================== FILE: detection\camera_zone2.py ====================
+
+import cv2
+import os
+import numpy as np
+from supervision import Detections
+from ultralytics import YOLO
+from config.settings import CAM_ZONE2_RTSP, YOLO_WEIGHTS, YOLO_CONF, YOLO_CLASSES
+from tracking.tracker import Tracker
+from fusion.fusion_layer import FusionLayer
+from utils.logger import get_logger
+
+log = get_logger("zone2")
+COLOR_CONFIRMED = (0, 220, 80)
+COLOR_UNKNOWN   = (0, 100, 255)
+
+class CameraZone2:
+    def __init__(self, fusion: FusionLayer):
+        self.fusion  = fusion
+        self.model   = YOLO(str(YOLO_WEIGHTS))
+        self.tracker = Tracker()
+        self._running = False
+
+    def run(self):
+        cap = self._open_rtsp()
+        if cap is None:
+            return
+        log.info("Zone 2 camera started (RTSP)")
+        self._running = True
+        while self._running:
+            ret, frame = cap.read()
+            if not ret:
+                log.warning("Zone2: RTSP read failed - reconnecting")
+                cap.release()
+                import time; time.sleep(2)
+                cap = self._open_rtsp()
+                if cap is None:
+                    break
+                continue
+            frame = cv2.resize(frame, (640, 480))
+            annotated = self._process(frame)
+            cv2.imshow("Zone 2 - Packing", annotated)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+        cap.release()
+        cv2.destroyWindow("Zone 2 - Packing")
+
+    def stop(self):
+        self._running = False
+
+    def _open_rtsp(self, retries: int = 10):
+        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
+        for attempt in range(retries):
+            cap = cv2.VideoCapture(CAM_ZONE2_RTSP, cv2.CAP_FFMPEG)
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 10000)
+            cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, 10000)
+            if cap.isOpened():
+                log.info(f"RTSP opened (attempt {attempt+1})")
+                return cap
+            log.warning(f"RTSP open failed attempt {attempt+1}/{retries}")
+            import time; time.sleep(2)
+        log.error("Cannot open RTSP after retries")
+        return None
+
+    def _process(self, frame: np.ndarray) -> np.ndarray:
+        results = self.model(frame, classes=YOLO_CLASSES, conf=YOLO_CONF, verbose=False)[0]
+        dets    = Detections.from_ultralytics(results)
+        tracked = self.tracker.update(dets)
+        for i, track_id in enumerate(tracked.tracker_id if tracked.tracker_id is not None else []):
+            x1, y1, x2, y2 = tracked.xyxy[i].astype(int)
+            if not self.fusion.is_confirmed(track_id):
+                crop = frame[max(0,y1):y2, max(0,x1):x2]
+                if crop.size > 0:
+                    self.fusion.identify_zone2(track_id, crop)
+            label = self.fusion.get_label(track_id)
+            color = COLOR_CONFIRMED if self.fusion.is_confirmed(track_id) else COLOR_UNKNOWN
+            cv2.rectangle(frame, (x1,y1), (x2,y2), color, 2)
+            cv2.putText(frame, label, (x1, y1-8),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.65, color, 2)
+        cv2.putText(frame, "ZONE 2", (8,24),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+        return frame
+
+
+
+==================== FILE: detection\camera_zone3.py ====================
+
+import cv2
+import os
+import numpy as np
+from supervision import Detections
+from ultralytics import YOLO
+from config.settings import CAM_ZONE3_RTSP, YOLO_WEIGHTS, YOLO_CONF, YOLO_CLASSES
+from tracking.tracker import Tracker
+from fusion.fusion_layer import FusionLayer
+from utils.logger import get_logger
+
+log = get_logger("zone3")
+COLOR_CONFIRMED = (0, 220, 80)
+COLOR_UNKNOWN   = (0, 100, 255)
+
+class CameraZone3:
+    def __init__(self, fusion: FusionLayer):
+        self.fusion  = fusion
+        self.model   = YOLO(str(YOLO_WEIGHTS))
+        self.tracker = Tracker()
+        self._running = False
+
+    def run(self):
+        cap = self._open_rtsp()
+        if cap is None:
+            return
+        log.info("Zone 3 camera started (RTSP)")
+        self._running = True
+        while self._running:
+            ret, frame = cap.read()
+            if not ret:
+                log.warning("zone3: RTSP read failed - reconnecting")
+                cap.release()
+                import time; time.sleep(2)
+                cap = self._open_rtsp()
+                if cap is None:
+                    break
+                continue
+            frame = cv2.resize(frame, (640, 480))
+            annotated = self._process(frame)
+            cv2.imshow("Zone 3 - Camera 192.168.1.4", annotated)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+        cap.release()
+        cv2.destroyWindow("Zone 3 - Camera 192.168.1.4")
+
+    def stop(self):
+        self._running = False
+
+    def _open_rtsp(self, retries: int = 10):
+        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
+        for attempt in range(retries):
+            cap = cv2.VideoCapture(CAM_ZONE3_RTSP, cv2.CAP_FFMPEG)
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 10000)
+            cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, 10000)
+            if cap.isOpened():
+                log.info(f"RTSP opened (attempt {attempt+1})")
+                return cap
+            log.warning(f"RTSP open failed attempt {attempt+1}/{retries}")
+            import time; time.sleep(2)
+        log.error("Cannot open RTSP after retries")
+        return None
+
+    def _process(self, frame: np.ndarray) -> np.ndarray:
+        results = self.model(frame, classes=YOLO_CLASSES, conf=YOLO_CONF, verbose=False)[0]
+        dets    = Detections.from_ultralytics(results)
+        tracked = self.tracker.update(dets)
+        for i, track_id in enumerate(tracked.tracker_id if tracked.tracker_id is not None else []):
+            x1, y1, x2, y2 = tracked.xyxy[i].astype(int)
+            if not self.fusion.is_confirmed(track_id):
+                crop = frame[max(0,y1):y2, max(0,x1):x2]
+                if crop.size > 0:
+                    self.fusion.identify_zone2(track_id, crop)
+            label = self.fusion.get_label(track_id)
+            color = COLOR_CONFIRMED if self.fusion.is_confirmed(track_id) else COLOR_UNKNOWN
+            cv2.rectangle(frame, (x1,y1), (x2,y2), color, 2)
+            cv2.putText(frame, label, (x1, y1-8),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.65, color, 2)
+        cv2.putText(frame, "Zone 3", (8,24),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 2)
+        return frame
+
+
+

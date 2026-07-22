@@ -1,0 +1,116 @@
+# Python / virtual env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# PlatformIO / build
+.pio/
+build/
+dist/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+firmware/config/device_config.h
+*.key
+*.pem
+
+# Runtime outputs / debug captures
+python_cv/outputs/
+python_cv/logs/
+python_cv/gallery/
+
+# Data ảnh / gallery / embedding - KHÔNG PUSH
+python_cv/data/*
+!python_cv/data/.gitkeep
+!python_cv/data/dataset_raw/
+python_cv/data/dataset_raw/*
+!python_cv/data/dataset_raw/.gitkeep
+!python_cv/data/evaluation/
+python_cv/data/evaluation/*
+!python_cv/data/evaluation/.gitkeep
+
+# Model folder - chỉ giữ README nếu có
+python_cv/models/*
+!python_cv/models/.gitkeep
+!python_cv/models/yolo/
+python_cv/models/yolo/*
+!python_cv/models/yolo/README.md
+
+# AI model weights / databases / embeddings
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.db
+*.sqlite
+*.sqlite3
+
+# Dataset / debug images / videos
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Local traces / archives
+ENV_TRACE_REPORT.csv
+*.zip
+*.rar
+*.7z
+
+# Local report/slide working files
+*.docx
+*.pptx
+*.pptm
+DO_AN_1*.pdf
+Huong dan thuc hien Do An-KLTN va viet bao cao.pdf
+DO_AN_1_BACKUP_*
+Slide_Template_BACKUP_*
+SildeMau_*
+prompt.md
+drawflowchart.md
+tonghop.md
+29_6_2026_lan_gan_nhat.md
+FL/
+backup_gallery_*/
+
+# One-off local camera/debug scripts
+python_cv/tools/scan_cameras*.py
+python_cv/tools/test_droidcam_endpoints.py
+python_cv/tools/test_two_irium_cams.py
+python_cv/tools/test_two_iriun_cams.py
+python_cv/tools/preview_zone1_*.py
+python_cv/tools/record_screen_demo.py
+
+# Duplicate/export folders - không cần push
+_EXPORT_FOR_TEAM_AI/
+warehouse-access-rfid-cv/
+
+# Hardware history
+hardware/pcb/warehouse_rfid_controller/.history/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# System
+.DS_Store
+Thumbs.db
+nul
+NUL
+
+.claude/settings.local.json
+.claude/skills/algorithm-flowchart/
+
+archive/

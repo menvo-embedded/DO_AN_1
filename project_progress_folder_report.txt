@@ -1,0 +1,529 @@
+﻿============================================================
+BAO CAO CAY THU MUC & TIEN DO DO AN
+HE THONG KIEM SOAT TRUY CAP KHO BANG RFID + CAMERA AI
+Generated: 2026-05-15 13:00:30
+============================================================
+
+===== 1. TONG QUAN CAC THU MUC CHINH =====
+
+[DONE] [OK] Project root
+Path    : D:\warehouse-access-rfid-cv
+Purpose : Thu muc goc cua do an, chua toan bo source code va cau truc he thong
+Status  : DONE
+Done    : Da khoi tao project chinh cho he thong RFID + Camera AI
+Next    : Tiep tuc dong goi source, them README va tai lieu huong dan chay
+Stats   : 1139 folders | 17518 files | 2526.16 MB
+
+[DOING] [OK] Python CV source
+Path    : D:\warehouse-access-rfid-cv\python_cv
+Purpose : Source code Python xu ly camera, AI, Re-ID, Fusion Layer, Dashboard
+Status  : IN PROGRESS
+Done    : Da co pipeline chinh: camera zones, detection, tracking, fusion, dashboard, model, tools
+Next    : Tich hop model Face Re-ID V2 vao local va test camera that
+Stats   : 118 folders | 9477 files | 2054.66 MB
+
+[DONE] [OK] Config
+Path    : D:\warehouse-access-rfid-cv\python_cv\config
+Purpose : Luu cau hinh he thong: camera, RTSP, model path, MQTT, threshold
+Status  : DONE
+Done    : Da cau hinh Zone 1 webcam/DroidCam, Zone 2/3 RTSP camera va bien moi truong
+Next    : Chuan hoa threshold Face/Re-ID sau khi test thuc chien
+Stats   : 1 folders | 6 files | 0.03 MB
+
+[DOING] [OK] Detection
+Path    : D:\warehouse-access-rfid-cv\python_cv\detection
+Purpose : Xu ly nguon camera tung zone va phat hien nguoi/khuon mat
+Status  : IN PROGRESS
+Done    : Da co camera Zone 1, Zone 2, Zone 3; camera stream da test OK
+Next    : Gan Face Re-ID V2 vao Zone 1 va Body Re-ID cho Zone 2/3
+Stats   : 1 folders | 10 files | 0.06 MB
+
+[DONE] [OK] Tracking
+Path    : D:\warehouse-access-rfid-cv\python_cv\tracking
+Purpose : Theo doi nguoi qua nhieu frame, gan track_id tam thoi
+Status  : DONE
+Done    : Da co tracking pipeline phuc vu YOLO + ByteTrack/track ID
+Next    : Kiem tra lai tracking khi co nhieu nguoi trong khung hinh
+Stats   : 1 folders | 4 files | 0 MB
+
+[DOING] [OK] Fusion Layer
+Path    : D:\warehouse-access-rfid-cv\python_cv\fusion
+Purpose : Hop nhat RFID + Camera + AI de map track_id voi employee_id
+Status  : IN PROGRESS
+Done    : Da co logic fusion theo zone, RFID event, track_id, source/status
+Next    : Them identify_zone3 va tich hop Face-first, Body Re-ID fallback
+Stats   : 1 folders | 5 files | 0.05 MB
+
+[MISSING] Recognition
+Path    : D:\warehouse-access-rfid-cv\python_cv\recognition
+Purpose : Xu ly nhan dien Face Re-ID / Body Re-ID / gallery matching
+Status  : IN PROGRESS
+Done    : Chua tim thay thu muc nay tren may
+Next    : Kiem tra lai duong dan hoac tao thu muc neu can
+
+[DOING] [OK] Models
+Path    : D:\warehouse-access-rfid-cv\python_cv\models
+Purpose : Luu cac model AI: YOLO, Body Re-ID, Face Re-ID, gallery embeddings
+Status  : IN PROGRESS
+Done    : Da co Body Re-ID V3 cleanval va engine model; Face Re-ID V2 dang chuan bi tich hop
+Next    : Giai nen face_reid_v2_outputs.zip vao day va cap nhat model path
+Stats   : 4 folders | 10 files | 404 MB
+
+[DONE] [OK] Runtime data
+Path    : D:\warehouse-access-rfid-cv\python_cv\data
+Purpose : Luu gallery, mapping nhan vien, du lieu phu cho runtime
+Status  : DONE
+Done    : Da co gallery NV001/NV002 cho Body Re-ID, mapping nhan vien da rut gon
+Next    : Them face gallery embeddings V2 neu dung Face Re-ID
+Stats   : 20 folders | 414 files | 204.2 MB
+
+[DONE] [OK] Database
+Path    : D:\warehouse-access-rfid-cv\python_cv\database
+Purpose : Luu schema, models, log su kien, trang thai hien dien
+Status  : DONE
+Done    : Da them current_zone, track_key, source, status; API presence da cap nhat
+Next    : Test log thuc te khi chay RFID + Camera dong thoi
+Stats   : 1 folders | 6 files | 0.02 MB
+
+[DOING] [OK] Dashboard
+Path    : D:\warehouse-access-rfid-cv\python_cv\dashboard
+Purpose : Giao dien hien thi trang thai nhan vien, zone, log, canh bao
+Status  : IN PROGRESS
+Done    : Da co dashboard hien thi current_zone, track_key, source
+Next    : Bo sung UI thong ke, canh bao, lich su ra/vao
+Stats   : 1 folders | 4 files | 0.01 MB
+
+[DOING] [OK] MQTT
+Path    : D:\warehouse-access-rfid-cv\python_cv\mqtt
+Purpose : Nhan event RFID tu ESP32 gui ve PC
+Status  : IN PROGRESS
+Done    : Da co cau truc MQTT listener va topic RFID
+Next    : Test lai ESP32 gui event that vao PC
+Stats   : 1 folders | 4 files | 0.01 MB
+
+[DONE] [OK] Tools
+Path    : D:\warehouse-access-rfid-cv\python_cv\tools
+Purpose : Cac script crop data, audit dataset, test camera, train/test model
+Status  : DONE
+Done    : Da dung nhieu tool de crop, audit, prepare Kaggle dataset, test camera, test model
+Next    : Dong goi lai cac tool quan trong va ghi huong dan chay
+Stats   : 1 folders | 57 files | 0.71 MB
+
+[DOING] [OK] Tests
+Path    : D:\warehouse-access-rfid-cv\python_cv\tests
+Purpose : Cac script test rieng tung module: camera, face recognition, Re-ID
+Status  : IN PROGRESS
+Done    : Da test Zone 1 face_recognition HOG, Zone 2 face recognition, 3 camera stream
+Next    : Them test Face Re-ID V2 local va test nguoi la Unknown
+Stats   : 1 folders | 37 files | 0.17 MB
+
+[DONE] [OK] Outputs
+Path    : D:\warehouse-access-rfid-cv\python_cv\outputs
+Purpose : Luu ket qua test: video annotate, debug frame, CSV, JSON summary
+Status  : DONE
+Done    : Da co noi luu ket qua demo, debug frame, camera test, face recognition test
+Next    : Chon anh/video dep dua vao bao cao tien do
+Stats   : 64 folders | 8865 files | 1415.25 MB
+
+[DONE] [OK] Dataset root V2
+Path    : D:\warehouse_dataset_v2
+Purpose : Thu muc dataset moi cho Face/Re-ID, audit report, Kaggle export
+Status  : DONE
+Done    : Da tao dataset V2 cho NV001/NV002, co train/val/test va zip Kaggle
+Next    : Chi cap nhat them sau khi review tay anh moi
+Stats   : 61 folders | 5034 files | 98.34 MB
+
+[DONE] [OK] Face data tieng Viet
+Path    : D:\warehouse_dataset_v2\face_data_tieng_viet
+Purpose : Dataset chinh de review thu cong, chia theo NV001/NV002 va L1-L5
+Status  : DONE
+Done    : Da du data L1-L5 cho NV001 va NV002; da loc nham nhan L3/L4
+Next    : Khong paste anh moi vao day neu chua duyet tay
+Stats   : 17 folders | 1739 files | 26.38 MB
+
+[DONE] [OK] Face train final EN
+Path    : D:\warehouse_dataset_v2\face_train_final_en
+Purpose : Ban export tieng Anh de train Kaggle
+Status  : DONE
+Done    : Da export ASCII-safe, tong 1284 anh sau khi sua loi lan data
+Next    : Chi generate lai khi dataset tieng Viet thay doi
+Stats   : 12 folders | 1288 files | 20.86 MB
+
+[DONE] [OK] Audit reports
+Path    : D:\warehouse_dataset_v2\audit_reports
+Purpose : Luu bao cao kiem tra dataset: so anh, split, layer, leak, readiness
+Status  : DONE
+Done    : Da co report kiem tra du data va leak group = 0
+Next    : Them report sau moi lan update dataset
+Stats   : 0 folders | 8 files | 0.69 MB
+
+[DONE] [OK] Video goc
+Path    : D:\FACE
+Purpose : Luu video goc dung de crop/review data khuon mat
+Status  : DONE
+Done    : Da co cac video goc dung tao dataset: VID20260503225026, VID_20260507_014519, VID_20260511_102449
+Next    : Quay them video holdout moi de test chong hoc vet
+Stats   : 0 folders | 3 files | 3984.05 MB
+
+[REVIEW] [OK] Candidate degraded
+Path    : D:\FACE_DEGRADED_CANDIDATES
+Purpose : Luu crop candidate tu video giam chat luong truoc khi review
+Status  : REVIEW
+Done    : Dung lam noi tap ket anh kho L4/L5 candidate
+Next    : Review tay truoc khi copy vao dataset chinh
+Stats   : 0 folders | 0 files | 0 MB
+
+[REVIEW] [OK] Review sorted
+Path    : D:\FACE_DEGRADED_REVIEW_SORTED
+Purpose : Luu anh da phan loai/review tu candidate degraded
+Status  : REVIEW
+Done    : Dung de tach anh giu/lop L4/L5/loai bo
+Next    : Chi anh da duyet moi duoc dua vao face_data_tieng_viet
+Stats   : 0 folders | 0 files | 0 MB
+
+
+===== 2. CAY THU MUC CHINH CO CHU THICH =====
+
+
+------------------------------------------------------------
+D:\warehouse-access-rfid-cv
+------------------------------------------------------------
+# Project root - Thu muc goc cua do an, chua toan bo source code va cau truc he thong | Status: DONE
+├── .pio
+│   ├── build
+│   │   └── esp32dev
+│   └── libdeps
+│       └── esp32dev
+├── .pytest_cache
+│   └── v
+│       └── cache
+├── .venv
+│   ├── Include
+│   ├── Lib
+│   │   └── site-packages
+│   ├── Scripts
+│   └── share
+│       └── man
+├── .vscode
+├── _EXPORT_FOR_TEAM_AI
+│   ├── .vscode
+│   ├── archive
+│   │   └── cleanup_old_files
+│   ├── docs
+│   │   ├── diagrams
+│   │   ├── proposal
+│   │   └── report_assets
+│   ├── experiments
+│   │   └── old_tests
+│   ├── firmware
+│   │   ├── config
+│   │   ├── examples
+│   │   ├── include
+│   │   ├── lib
+│   │   └── src
+│   ├── hardware
+│   │   └── pcb
+│   ├── python_cv
+│   │   ├── assets
+│   │   ├── config
+│   │   ├── dashboard
+│   │   ├── database
+│   │   ├── detection
+│   │   ├── fusion
+│   │   ├── mqtt
+│   │   ├── reid
+│   │   ├── scripts
+│   │   ├── tests
+│   │   ├── tools
+│   │   ├── tracking
+│   │   └── utils
+│   └── warehouse-access-rfid-cv
+│       ├── firmware
+│       └── python_cv
+├── archive
+│   └── cleanup_old_files
+├── docs
+│   ├── diagrams
+│   ├── proposal
+│   └── report_assets
+├── experiments
+│   └── old_tests
+├── firmware
+│   ├── .pio
+│   │   ├── build
+│   │   └── libdeps
+│   ├── config
+│   ├── examples
+│   │   └── test_oled
+│   ├── include
+│   ├── lib
+│   └── src
+├── hardware
+│   └── pcb
+│       ├── gerber
+│       └── warehouse_rfid_controller
+├── python_cv  # Python CV source - Source code Python xu ly camera, AI, Re-ID, Fusion Layer, Dashboard | Status: IN PROGRESS
+│   ├── __pycache__
+│   ├── assets
+│   │   └── sample_images
+│   ├── config  # Config - Luu cau hinh he thong: camera, RTSP, model path, MQTT, threshold | Status: DONE
+│   │   └── __pycache__
+│   ├── dashboard  # Dashboard - Giao dien hien thi trang thai nhan vien, zone, log, canh bao | Status: IN PROGRESS
+│   │   └── __pycache__
+│   ├── data  # Runtime data - Luu gallery, mapping nhan vien, du lieu phu cho runtime | Status: DONE
+│   │   ├── archive_old_gallery
+│   │   ├── dataset_crops
+│   │   ├── dataset_raw
+│   │   ├── evaluation
+│   │   ├── face_gallery
+│   │   ├── gallery
+│   │   └── gallery_backup_20260428_041306
+│   ├── database  # Database - Luu schema, models, log su kien, trang thai hien dien | Status: DONE
+│   │   └── __pycache__
+│   ├── detection  # Detection - Xu ly nguon camera tung zone va phat hien nguoi/khuon mat | Status: IN PROGRESS
+│   │   └── __pycache__
+│   ├── fusion  # Fusion Layer - Hop nhat RFID + Camera + AI de map track_id voi employee_id | Status: IN PROGRESS
+│   │   └── __pycache__
+│   ├── models  # Models - Luu cac model AI: YOLO, Body Re-ID, Face Re-ID, gallery embeddings | Status: IN PROGRESS
+│   │   ├── insightface
+│   │   └── yolo
+│   ├── mqtt  # MQTT - Nhan event RFID tu ESP32 gui ve PC | Status: IN PROGRESS
+│   │   └── __pycache__
+│   ├── outputs  # Outputs - Luu ket qua test: video annotate, debug frame, CSV, JSON summary | Status: DONE
+│   │   ├── dataset_quality_audit
+│   │   ├── debug_frames
+│   │   ├── demo_evidence_zone_localization
+│   │   ├── demo_evidence_zone2_hybrid
+│   │   ├── final_demo
+│   │   ├── logs
+│   │   ├── perf_tests
+│   │   ├── reid_calibration
+│   │   ├── review_test_images
+│   │   ├── runs
+│   │   ├── standalone_webcam_hybrid_debug
+│   │   ├── video_quality_samples
+│   │   ├── zone2_hybrid_reid_video_test
+│   │   └── zone2_reid_debug
+│   ├── reid
+│   │   └── __pycache__
+│   ├── scripts
+│   │   └── __pycache__
+│   ├── tests  # Tests - Cac script test rieng tung module: camera, face recognition, Re-ID | Status: IN PROGRESS
+│   │   └── __pycache__
+│   ├── tools  # Tools - Cac script crop data, audit dataset, test camera, train/test model | Status: DONE
+│   │   └── __pycache__
+│   ├── tracking  # Tracking - Theo doi nguoi qua nhieu frame, gan track_id tam thoi | Status: DONE
+│   │   └── __pycache__
+│   └── utils
+│       └── __pycache__
+├── scripts
+└── warehouse-access-rfid-cv
+    ├── firmware
+    │   └── src
+    └── python_cv
+        ├── config
+        ├── database
+        ├── detection
+        ├── fusion
+        ├── mqtt
+        ├── reid
+        ├── tracking
+        └── utils
+
+------------------------------------------------------------
+D:\warehouse-access-rfid-cv\python_cv
+------------------------------------------------------------
+# Python CV source - Source code Python xu ly camera, AI, Re-ID, Fusion Layer, Dashboard | Status: IN PROGRESS
+├── __pycache__
+├── assets
+│   └── sample_images
+├── config  # Config - Luu cau hinh he thong: camera, RTSP, model path, MQTT, threshold | Status: DONE
+│   └── __pycache__
+├── dashboard  # Dashboard - Giao dien hien thi trang thai nhan vien, zone, log, canh bao | Status: IN PROGRESS
+│   └── __pycache__
+├── data  # Runtime data - Luu gallery, mapping nhan vien, du lieu phu cho runtime | Status: DONE
+│   ├── archive_old_gallery
+│   ├── dataset_crops
+│   │   ├── NV001
+│   │   └── unknown
+│   ├── dataset_raw
+│   ├── evaluation
+│   ├── face_gallery
+│   │   └── raw
+│   ├── gallery
+│   │   ├── NV001
+│   │   ├── NV002
+│   │   ├── NV003
+│   │   ├── NV004
+│   │   └── NV005
+│   └── gallery_backup_20260428_041306
+├── database  # Database - Luu schema, models, log su kien, trang thai hien dien | Status: DONE
+│   └── __pycache__
+├── detection  # Detection - Xu ly nguon camera tung zone va phat hien nguoi/khuon mat | Status: IN PROGRESS
+│   └── __pycache__
+├── fusion  # Fusion Layer - Hop nhat RFID + Camera + AI de map track_id voi employee_id | Status: IN PROGRESS
+│   └── __pycache__
+├── models  # Models - Luu cac model AI: YOLO, Body Re-ID, Face Re-ID, gallery embeddings | Status: IN PROGRESS
+│   ├── insightface
+│   │   ├── buffalo_sc
+│   │   └── buffalo_sc_extracted
+│   └── yolo
+├── mqtt  # MQTT - Nhan event RFID tu ESP32 gui ve PC | Status: IN PROGRESS
+│   └── __pycache__
+├── outputs  # Outputs - Luu ket qua test: video annotate, debug frame, CSV, JSON summary | Status: DONE
+│   ├── dataset_quality_audit
+│   ├── debug_frames
+│   │   ├── build_face_gallery_from_dataset_crops
+│   │   ├── camera_probe
+│   │   ├── camera_probe_droidcam
+│   │   ├── camera_quality_test
+│   │   ├── face_recognition_zone1_rotate_test
+│   │   ├── face_recognition_zone1_test
+│   │   ├── face_recognition_zone2_test
+│   │   ├── insightface_gallery_enroll
+│   │   ├── insightface_zone2_identify
+│   │   └── insightface_zone2_test
+│   ├── demo_evidence_zone_localization
+│   ├── demo_evidence_zone2_hybrid
+│   ├── final_demo
+│   ├── logs
+│   ├── perf_tests
+│   ├── reid_calibration
+│   ├── review_test_images
+│   │   └── zone2_reid_debug
+│   ├── runs
+│   ├── standalone_webcam_hybrid_debug
+│   │   ├── 20260507_004134
+│   │   ├── 20260507_005750
+│   │   └── 20260507_010218
+│   ├── video_quality_samples
+│   │   └── VID20260503225026
+│   ├── zone2_hybrid_reid_video_test
+│   └── zone2_reid_debug
+│       ├── 20260504_012022
+│       └── 20260504_012159
+├── reid
+│   └── __pycache__
+├── scripts
+│   └── __pycache__
+├── tests  # Tests - Cac script test rieng tung module: camera, face recognition, Re-ID | Status: IN PROGRESS
+│   └── __pycache__
+├── tools  # Tools - Cac script crop data, audit dataset, test camera, train/test model | Status: DONE
+│   └── __pycache__
+├── tracking  # Tracking - Theo doi nguoi qua nhieu frame, gan track_id tam thoi | Status: DONE
+│   └── __pycache__
+└── utils
+    └── __pycache__
+
+------------------------------------------------------------
+D:\warehouse_dataset_v2
+------------------------------------------------------------
+# Dataset root V2 - Thu muc dataset moi cho Face/Re-ID, audit report, Kaggle export | Status: DONE
+├── audit_reports  # Audit reports - Luu bao cao kiem tra dataset: so anh, split, layer, leak, readiness | Status: DONE
+├── face_data_tieng_viet  # Face data tieng Viet - Dataset chinh de review thu cong, chia theo NV001/NV002 va L1-L5 | Status: DONE
+│   ├── _Loại_bỏ
+│   │   ├── Crop_lỗi
+│   │   ├── Không_thấy_mặt
+│   │   ├── Quá_mờ
+│   │   └── Sai_người
+│   ├── NV001_Mến
+│   │   ├── L1_Dễ_chính_diện_rõ_mặt
+│   │   ├── L2_Bình_thường_hơi_nghiêng
+│   │   ├── L3_Biến_thể_góc_mặt
+│   │   ├── L4_Khó_hợp_lệ
+│   │   └── L5_Rất_khó_hợp_lệ
+│   └── NV002_Đức
+│       ├── L1_Dễ_chính_diện_rõ_mặt
+│       ├── L2_Bình_thường_hơi_nghiêng
+│       ├── L3_Biến_thể_góc_mặt
+│       ├── L4_Khó_hợp_lệ
+│       └── L5_Rất_khó_hợp_lệ
+├── face_train_final_en  # Face train final EN - Ban export tieng Anh de train Kaggle | Status: DONE
+│   ├── NV001_Men
+│   │   ├── L1_easy_front_clear
+│   │   ├── L2_normal_slight_angle
+│   │   ├── L3_pose_variation
+│   │   ├── L4_hard_valid
+│   │   └── L5_extreme_hard_valid
+│   └── NV002_Duc
+│       ├── L1_easy_front_clear
+│       ├── L2_normal_slight_angle
+│       ├── L3_pose_variation
+│       ├── L4_hard_valid
+│       └── L5_extreme_hard_valid
+└── face_train_layered
+    ├── _reject
+    │   ├── bad_crop
+    │   ├── no_face
+    │   ├── too_blur
+    │   └── wrong_person
+    ├── _to_sort_Men_Duc
+    │   ├── L1_easy_front_clear
+    │   ├── L2_normal_clean
+    │   ├── L3_pose_variation
+    │   ├── L4_hard_valid
+    │   └── L5_extreme_hard_valid
+    ├── NV001_Men
+    │   ├── L1_easy_front_clear
+    │   ├── L2_normal_clean
+    │   ├── L3_pose_variation
+    │   ├── L4_hard_valid
+    │   └── L5_extreme_hard_valid
+    └── NV002_Duc
+        ├── L1_easy_front_clear
+        ├── L2_normal_clean
+        ├── L3_pose_variation
+        ├── L4_hard_valid
+        └── L5_extreme_hard_valid
+
+===== 3. TONG HOP TIEN DO THEO HANG MUC =====
+
+[DOING] Phan cung ESP32 + RFID
+Status : IN PROGRESS
+Done   : Da xac dinh module ESP32, RC522, LCD I2C, buzzer, servo, LED; da co so do chan va firmware test co ban
+Next   : Test ESP32 gui su kien RFID ve PC va phan hoi LCD/Buzzer/Servo
+
+[DONE] Camera multi-zone
+Status : DONE
+Done   : Zone 1 webcam/DroidCam, Zone 2 RTSP 192.168.1.3, Zone 3 RTSP 192.168.1.4 da test stream OK
+Next   : Gan pipeline nhan dien vao tung zone
+
+[DONE] YOLO Detection + Tracking
+Status : DONE
+Done   : Da co phat hien nguoi va track_id; co output debug/video/csv
+Next   : Test lai khi co nhieu nguoi trong khung hinh
+
+[DONE] Body Re-ID
+Status : DONE
+Done   : Model Re-ID V3 cleanval da train, local engine load duoc, gallery NV001/NV002 moi nguoi 30 embeddings
+Next   : Sua matching logic sang top-k mean + threshold + margin neu can
+
+[DOING] Face Re-ID
+Status : IN PROGRESS
+Done   : Dataset NV001/NV002 L1-L5 da lam sach; Kaggle train dat val 99.48%, test 99.25%
+Next   : Tai model ve local, tich hop face_reid_engine_v2.py va test holdout video moi
+
+[DONE] Dataset
+Status : DONE
+Done   : Data chinh tieng Viet da du; export Kaggle ASCII-safe; leak groups = 0
+Next   : Chi bo sung L4/L5 sau khi review tay candidate
+
+[DOING] Fusion Layer
+Status : IN PROGRESS
+Done   : Da co logic hop nhat RFID + zone + track_id + source/status
+Next   : Hoan thien Face-first, Body fallback, Unknown handling, identify_zone3
+
+[DOING] Dashboard + Database
+Status : IN PROGRESS
+Done   : Da cap nhat database presence va dashboard hien thi current_zone/source/track_key
+Next   : Them lich su, canh bao va thong ke demo
+
+[DOING] Bao cao & so do
+Status : IN PROGRESS
+Done   : Da co so do kien truc phan tang, luong xu ly he thong, so do chan phan cung dang ve lai
+Next   : Chen vao bao cao tien do va viet giai thich tung hinh
+
+============================================================
+REPORT SAVED TO:
+D:\warehouse-access-rfid-cv\project_progress_folder_report.txt
+============================================================

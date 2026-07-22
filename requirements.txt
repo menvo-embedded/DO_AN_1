@@ -1,0 +1,22 @@
+# Core CV pipeline
+ultralytics>=8.3.0
+supervision>=0.24.0
+opencv-python>=4.9.0
+numpy>=1.24.0
+scipy>=1.11.0
+PyYAML>=6.0
+python-dotenv>=1.0.0
+
+# Re-ID and model runtime
+torch>=2.0.0
+torchvision>=0.15.0
+git+https://github.com/KaiyangZhou/deep-person-reid.git
+
+# InsightFace hybrid recognition
+insightface>=0.7.3
+onnxruntime>=1.17.0
+Pillow>=10.0.0
+
+# MQTT, database, dashboard
+paho-mqtt>=2.0.0
+flask>=3.0.0
